@@ -351,8 +351,11 @@ try:
         new_h = int(colh * min(w/colw, h/colh))
 
         resized_image = cv2.resize(color_image, (new_w, new_h), interpolation = cv2.INTER_CUBIC)
+        resized_image_depth=cv2.resize(depth_image, (new_w, new_h), interpolation = cv2.INTER_CUBIC)
         canvas = np.full((h, w, 3), 128)
+        canvas_depth = np.full((h, w, 1), 128)
         canvas[(h - new_h)//2:(h - new_h)//2 + new_h,(w - new_w)//2:(w - new_w)//2 + new_w, :] = resized_image
+        canvas_depth[(h - new_h)//2:(h - new_h)//2 + new_h,(w - new_w)//2:(w - new_w)//2 + new_w, :] = resized_image_depth
 
         prepimg = canvas
         prepimg = prepimg[np.newaxis, :, :, :]     # Batch size axis add
@@ -379,8 +382,11 @@ try:
         frameClone = np.uint8(canvas.copy())
         for i in range(nPoints):
             for j in range(len(detected_keypoints[i])):
+                kp_x=(detected_keypoints[i][j][0]/canvas.shape[0])*colw
+                kp_y=(detected_keypoints[i][j][1]/canvas.shape[1])*colh
+                realX,realY,realZ=rs.rs2_deproject_pixel_to_point(depth_intrin,[kp_y,kp_x],depth_image[int(kp_y)-1][int(kp_x)])
                 cv2.circle(frameClone, detected_keypoints[i][j][0:2], 5, colors[i], -1, cv2.LINE_AA)
-
+                cv2.putText(frameClone,str([realX,realY,realZ]),(detected_keypoints[i][j][0:2]),(cv2.FONT_HERSHEY_COMPLEX),0.6,(0,255,0),1,cv2.LINE_AA)
         valid_pairs, invalid_pairs = getValidPairs(outputs, w, h)
         personwiseKeypoints = getPersonwiseKeypoints(valid_pairs, invalid_pairs)
 
