@@ -380,6 +380,7 @@ try:
             detected_keypoints.append(keypoints_with_id)
 
         frameClone = np.uint8(canvas.copy())
+        
         for i in range(nPoints):
             for j in range(len(detected_keypoints[i])):
                 realX,realY,realZ=rs.rs2_deproject_pixel_to_point(depth_intrin,detected_keypoints[i][j][0:2],depth_image[detected_keypoints[i][j][0]][detected_keypoints[i][j][1]])
