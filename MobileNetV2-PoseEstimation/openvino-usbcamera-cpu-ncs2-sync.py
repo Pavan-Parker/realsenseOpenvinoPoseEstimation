@@ -382,9 +382,7 @@ try:
         frameClone = np.uint8(canvas.copy())
         for i in range(nPoints):
             for j in range(len(detected_keypoints[i])):
-                kp_x=(detected_keypoints[i][j][0]/canvas.shape[0])*colw
-                kp_y=(detected_keypoints[i][j][1]/canvas.shape[1])*colh
-                realX,realY,realZ=rs.rs2_deproject_pixel_to_point(depth_intrin,[kp_y,kp_x],depth_image[int(kp_y)-1][int(kp_x)])
+                realX,realY,realZ=rs.rs2_deproject_pixel_to_point(depth_intrin,detected_keypoints[i][j][0:2],depth_image[detected_keypoints[i][j][0]][detected_keypoints[i][j][1]])
                 cv2.circle(frameClone, detected_keypoints[i][j][0:2], 5, colors[i], -1, cv2.LINE_AA)
                 cv2.putText(frameClone,str([realX,realY,realZ]),(detected_keypoints[i][j][0:2]),(cv2.FONT_HERSHEY_COMPLEX),0.6,(0,255,0),1,cv2.LINE_AA)
         valid_pairs, invalid_pairs = getValidPairs(outputs, w, h)
